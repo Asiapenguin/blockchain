@@ -1,12 +1,12 @@
-import { Block } from "./block";
-import { Transaction } from "./transaction";
-import * as hash from "hash.js";
+import { Block } from './block';
+import { Transaction } from './transaction';
+import * as hash from 'hash.js';
 
 
 export class Blockchain {
   
-  chain;
-  pendingTransactions;
+  chain: Array<Block>;
+  pendingTransactions: Array<Transaction>;
 
   constructor() {
     this.chain = [];
@@ -16,7 +16,7 @@ export class Blockchain {
   }
 
   createNewBlock(nonce, prevHash, hash): Block {
-    const index = this.chain.length + 1;
+    const index = this.chain.length;
     const newBlock = new Block(index, Date.now(), this.pendingTransactions, nonce, hash, prevHash);
 
     this.pendingTransactions = [];
@@ -33,12 +33,12 @@ export class Blockchain {
     const newTransaction = new Transaction(amount, sender, receiver);
     this.pendingTransactions.push(newTransaction);
 
-    return this.getLastBlock().getIndex() + 1;
+    return this.getLastBlock().index + 1;
   }
 
   // SHA-256
   hashBlock(data: Block, nonce: number): string {
-    const dataString = data.getPrevHash() + nonce.toString() + JSON.stringify(data.getTransactions());
+    const dataString = data.prevHash + nonce.toString() + JSON.stringify(data.transactions);
     const resultHash = hash.sha256().update(dataString).digest('hex');
 
     return resultHash;

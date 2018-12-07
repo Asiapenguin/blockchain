@@ -1,7 +1,7 @@
 export class Transaction {
-  amount;
-  sender;
-  receiver;
+  amount: number;
+  sender: string;
+  receiver: string;
   
   constructor(amount, sender, receiver) {
     this.amount = amount;
