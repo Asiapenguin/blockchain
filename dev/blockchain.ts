@@ -1,16 +1,22 @@
 import { Block } from './block';
 import { Transaction } from './transaction';
 import * as hash from 'hash.js';
-
+const currentNodeURL = process.argv[3];
 
 export class Blockchain {
   
   chain: Array<Block>;
   pendingTransactions: Array<Transaction>;
+  currentNodeURL: string;
+  networkNodesURL: Array<string>;
 
   constructor() {
     this.chain = [];
     this.pendingTransactions = [];
+
+    this.currentNodeURL = currentNodeURL
+    this.networkNodesURL = [];
+
     // Genesis block
     this.createNewBlock(100, '0', '0');
   }
