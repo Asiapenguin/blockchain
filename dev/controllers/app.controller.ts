@@ -249,4 +249,53 @@ app.post("/register-nodes", (req: Request, res: Response) => {
   });
 });
 
+app.get('/consensus', async (req: Request, res: Response) => {
+  const reqPromises = [];
+  for (let networkNodeURL of blockchain.networkNodesURL) {
+    const reqOptions = {
+      uri: networkNodeURL + '/blockchain',
+      method: 'GET',
+      json: true
+    };
+
+    reqPromises.push(rp(reqOptions));
+  }
+
+  try {
+    const blockchains = await Promise.all(reqPromises);
+    
+    // Longest chain comparison
+    const currentChainLength = blockchain.chain.length;
+    let maxChainLength = currentChainLength;
+    let newLongestChain = null;
+    let newPendingTransactions = null; 
+
+    for (let blockchain of blockchains) {
+      if (blockchain.chain.length > maxChainLength) {
+        maxChainLength = blockchain.chain.length;
+        newLongestChain = blockchain;
+        newPendingTransactions = blockchain.pendingTransactions;
+      }
+    }
+
+    if (!newLongestChain || (newLongestChain && !blockchain.isChainValid(newLongestChain))) {
+      res.json({
+        note: "Current blockchain has not been replaced",
+        chain: blockchain.chain
+      })
+    } else {
+      blockchain.chain = newLongestChain.chain;
+      blockchain.pendingTransactions = newPendingTransactions
+      res.json({
+        note: "Blockchain replaced with longest chain.",
+        chain: blockchain.chain
+      });
+    }
+  } catch (err) {
+    res.json({
+      error: "Error in processing blockchain promises."
+    });
+  }
+})
+
 export const AppController: Router = app;

@@ -25,6 +25,8 @@ app.use('/register-node', AppController);
 
 app.use('/register-nodes', AppController);
 
+app.use('/consensus', AppController);
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 })
