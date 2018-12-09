@@ -1,6 +1,8 @@
 import { Block } from './block';
 import { Transaction } from './transaction';
 import * as hash from 'hash.js';
+import uuid = require("uuid/v1");
+
 const currentNodeURL = process.argv[3];
 
 export class Blockchain {
@@ -35,10 +37,16 @@ export class Blockchain {
     return this.chain[this.chain.length - 1];
   }
 
-  createTransaction(amount, sender, receiver): number {
-    const newTransaction = new Transaction(amount, sender, receiver);
-    this.pendingTransactions.push(newTransaction);
+  createNewTransaction(amount, sender, receiver): Transaction {
+    const newUuid = uuid().split('-').join('');
+    const newTransaction = new Transaction(newUuid, amount, sender, receiver);
 
+    return newTransaction;
+  }
+
+  addTransactionToPendingTransactions(transaction: Transaction): number {
+    this.pendingTransactions.push(transaction);
+    
     return this.getLastBlock().index + 1;
   }
 

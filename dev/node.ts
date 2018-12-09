@@ -11,9 +11,13 @@ app.use('/', AppController);
 
 app.use('/blockchain', AppController);
 
+app.use('/transaction/broadcast', AppController);
+
 app.use('/transaction', AppController);
 
 app.use('/mine', AppController);
+
+app.use('/receive-new-block', AppController);
 
 app.use('/register-broadcast-node', AppController);
 

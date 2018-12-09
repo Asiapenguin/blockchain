@@ -13,8 +13,8 @@ describe("BlockchainTest", () => {
     "47787110B5C621433BE3607B9B50";
 
   const transactions = [
-    new Transaction(100, "ADKFH123", "34HH123SAF"),
-    new Transaction(100, "PIOH14123", "HKLH123SDF")
+    new Transaction("IUO9UASIU12", 100, "ADKFH123", "34HH123SAF"),
+    new Transaction("9H2J3KH8JAS", 100, "PIOH14123", "HKLH123SDF")
   ];
 
   it("should create a new block", () => {
