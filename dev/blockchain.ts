@@ -127,4 +127,48 @@ export class Blockchain {
       return false;
     }
   }
+
+  getBlock(blockHash: string): Block {
+    for (let block of this.chain) {
+      if (block.hash === blockHash) {
+        return block;
+      }
+    }
+    return null;
+  }
+
+  getTransaction(transactionID: string): Transaction {
+    for (let block of this.chain) {
+      for (let transaction of block.transactions) {
+        if (transaction.uuid === transactionID) {
+          return transaction;
+        }
+      }
+    }
+    return null;
+  }
+
+  getAddress(address: string) {
+    const transactions: Array<Transaction> = [];
+    for (let block of this.chain) {
+      for (let transaction of block.transactions) {
+        if (transaction.receiver === address || transaction.sender === address) {
+          transactions.push(transaction);
+        }
+      }
+    }
+
+    let balance = 0;
+    for (let transaction of transactions) {
+      if (transaction.receiver === address) {
+        balance += transaction.amount;
+      } else {
+        balance -= transaction.amount;
+      }
+    }
+    return {
+      transactions: transactions,
+      balance: balance
+    };
+  }
 }

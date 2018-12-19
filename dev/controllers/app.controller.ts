@@ -106,7 +106,7 @@ app.get("/mine", async (req: Request, res: Response) => {
 
     // reward miner
     const reqOptions = {
-      uri: blockchain.currentNodeURL + '/transaction/broadcast',
+      uri: blockchain.currentNodeURL + "/transaction/broadcast",
       method: "POST",
       body: {
         amount: 12.5,
@@ -114,19 +114,19 @@ app.get("/mine", async (req: Request, res: Response) => {
         receiver: nodeAddress
       },
       json: true
-    }
+    };
 
     try {
       await rp(reqOptions);
     } catch (err) {
       res.json({
         error: "Error in processing transaction/broadcast promise."
-      })
+      });
     }
   } catch (err) {
     res.json({
       error: "Error in processing receive-new-block promises."
-    })
+    });
   }
 
   res.json({
@@ -150,17 +150,18 @@ app.post("/receive-new-block", (req: Request, res: Response) => {
       res.json({
         note: "New block received and added to chain",
         newBlock: newBlock
-      })
+      });
     } else {
       res.json({
-        error: "New block does not have correct hash or index and thus rejected.",
+        error:
+          "New block does not have correct hash or index and thus rejected.",
         newBlock: newBlock
-      })
+      });
     }
   } else {
     res.json({
       error: "JSON must include newBlock."
-    })
+    });
   }
 });
 
@@ -249,12 +250,12 @@ app.post("/register-nodes", (req: Request, res: Response) => {
   });
 });
 
-app.get('/consensus', async (req: Request, res: Response) => {
+app.get("/consensus", async (req: Request, res: Response) => {
   const reqPromises = [];
   for (let networkNodeURL of blockchain.networkNodesURL) {
     const reqOptions = {
-      uri: networkNodeURL + '/blockchain',
-      method: 'GET',
+      uri: networkNodeURL + "/blockchain",
+      method: "GET",
       json: true
     };
 
@@ -263,12 +264,12 @@ app.get('/consensus', async (req: Request, res: Response) => {
 
   try {
     const blockchains = await Promise.all(reqPromises);
-    
+
     // Longest chain comparison
     const currentChainLength = blockchain.chain.length;
     let maxChainLength = currentChainLength;
     let newLongestChain = null;
-    let newPendingTransactions = null; 
+    let newPendingTransactions = null;
 
     for (let blockchain of blockchains) {
       if (blockchain.chain.length > maxChainLength) {
@@ -278,14 +279,17 @@ app.get('/consensus', async (req: Request, res: Response) => {
       }
     }
 
-    if (!newLongestChain || (newLongestChain && !blockchain.isChainValid(newLongestChain))) {
+    if (
+      !newLongestChain ||
+      (newLongestChain && !blockchain.isChainValid(newLongestChain))
+    ) {
       res.json({
         note: "Current blockchain has not been replaced",
         chain: blockchain.chain
-      })
+      });
     } else {
       blockchain.chain = newLongestChain.chain;
-      blockchain.pendingTransactions = newPendingTransactions
+      blockchain.pendingTransactions = newPendingTransactions;
       res.json({
         note: "Blockchain replaced with longest chain.",
         chain: blockchain.chain
@@ -296,6 +300,30 @@ app.get('/consensus', async (req: Request, res: Response) => {
       error: "Error in processing blockchain promises."
     });
   }
-})
+});
+
+app.get("/block/:blockHash", (req: Request, res: Response) => {
+  const blockHash = req.params.blockHash;
+  const block = blockchain.getBlock(blockHash);
+  res.json({
+    block: block
+  });
+});
+
+app.get("/transaction/:transactionID", (req: Request, res: Response) => {
+  const transactionID = req.params.transactionID;
+  const transaction = blockchain.getTransaction(transactionID);
+  res.json({
+    transaction: transaction
+  });
+});
+
+app.get("/address/:address", (req: Request, res: Response) => {
+  const address = req.params.address;
+  const addressData = blockchain.getAddress(address);
+  res.json({
+    data: addressData
+  });
+});
 
 export const AppController: Router = app;

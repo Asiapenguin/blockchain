@@ -27,6 +27,12 @@ app.use('/register-nodes', AppController);
 
 app.use('/consensus', AppController);
 
+app.use('/block/:blockHash', AppController);
+
+app.use('/transaction/:transactionID', AppController);
+
+app.use('/address/:address', AppController);
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}/`);
 })
